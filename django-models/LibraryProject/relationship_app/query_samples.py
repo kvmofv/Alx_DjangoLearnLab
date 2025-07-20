@@ -6,7 +6,10 @@ django.setup()
 
 from relationship_app.models import Author, Book, Library, Librarian  
 
-books = Book.objects.filter(author__name='F. Scott Fitzgerald')
+author_name = 'F. Scott Fitzgerald'
+author = Author.objects.get(name=author_name)
+books = Book.objects.filter(author=author)
+
 
 library_name = 'Maddison'
 
