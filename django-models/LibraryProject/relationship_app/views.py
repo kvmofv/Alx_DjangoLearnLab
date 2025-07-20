@@ -10,18 +10,6 @@ from django.contrib.auth.views import LoginView, LogoutView
 from django.views.generic.detail import DetailView
 from .models import Library, Book
 
-class UserProfile(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    ROLES = [
-        ('Admin', 'Admin'),
-        ('Librarian', 'Librarian'),
-        ('Member', 'Member'),
-    ]
-    role = models.CharField(max_length=100, choices=ROLES)
-
-    def __str__(self):
-        return f"{self.user.username} - {self.role}"
-
 @receiver(post_save, sender=User)
 def create_user_profile(sender, instance, created):
     if created:
