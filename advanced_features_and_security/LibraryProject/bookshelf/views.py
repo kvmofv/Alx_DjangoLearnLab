@@ -2,6 +2,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import permission_required
 from relationship_app.forms import BookForm
 from .models import Book
+from .forms import ExampleForm
+
+def example_form_view(request):
+    form = ExampleForm()
+    return render(request, 'bookshelf/form_example.html', {'form': form})
+
 
 # Views below use @permission_required to enforce custom Book permissions.
 # Each view checks:
