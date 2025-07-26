@@ -49,6 +49,6 @@ def delete_book(request, pk):
     return render(request, 'relationship_app/delete_book.html', {'book': book})
 
 @permission_required('bookshelf.can_view', raise_exception=True)
-def list_books(request):
+def book_list(request):
     books = Book.objects.all()
     return render(request, 'relationship_app/list_books.html', {'books': books})
