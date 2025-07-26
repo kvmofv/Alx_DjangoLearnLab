@@ -1,7 +1,7 @@
 from django.contrib.auth.forms import UserCreationForm
+from bookshelf.models import CustomUser
 from django import forms
 from .models import Book
-from bookshelf.models import CustomUser
 
 class BookForm(forms.ModelForm):
     class Meta:

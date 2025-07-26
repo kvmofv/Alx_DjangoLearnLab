@@ -30,15 +30,34 @@ class CustomUser(AbstractUser):
     ]
     role = models.CharField(max_length=100, choices=ROLES)
     date_of_birth = models.DateField(null=True, blank=True)
-    profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)\
-    
+    profile_photo = models.ImageField(upload_to='profile_photos/', null=True, blank=True)
+     
     objects = CustomUserManager()
 
     def __str__(self):
         return self.username
 
+# This model defines custom permissions:
+# - can_view: View books in custom views
+# - can_create: Add books in custom views
+# - can_edit: Edit books in custom views
+# - can_delete: Delete books in custom views
+#
+# These are enforced in views.py using @permission_required decorators.
+# Groups are:
+# - Viewers: can_view
+# - Editors: can_create, can_edit
+# - Admins: all permissions
 
 class Book(models.Model):
     title = models.CharField(max_length = 200)
     author = models.CharField(max_length = 200)
     publication_year = models.IntegerField()
+
+    class Meta:
+        permissions = [
+            ("can_view", "Can view boook"),
+            ("can_edit", "Can edit book"),
+            ("can_create", "Can create book"),
+            ("can_add", "Can add book"),
+        ]
