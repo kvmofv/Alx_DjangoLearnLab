@@ -33,13 +33,18 @@ SECURE_CONTENT_TYPE_NOSNIFF = True
 CSRF_COOKIE_SECURE = True
 SESSION_COOKIE_SECURE = True
 
-# ✅ Redirect all HTTP → HTTPS
-SECURE_SSL_REDIRECT = True  # Forces all non-HTTPS requests to HTTPS
+# Redirect all HTTP → HTTPS
+SECURE_SSL_REDIRECT = True  
 
-# ✅ Strict Transport Security (HSTS)
-SECURE_HSTS_SECONDS = 31536000  # 1 year
+# Trust X-Forwarded-Proto header from proxy/load balancer
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+
+# Strict Transport Security (HSTS)
+SECURE_HSTS_SECONDS = 31536000 
 SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
+
+
 
 
 ALLOWED_HOSTS = []
