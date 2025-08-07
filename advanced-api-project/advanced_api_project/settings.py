@@ -45,6 +45,7 @@ REST_FRAMEWORK = {
     'DEFAULT_FILTER_BACKENDS': [
         'rest_framework.filters.SearchFilter',
         'rest_framework.filters.OrderingFilter',
+        'dajngo_filters.rest_framework.DjangoFilterBackend',
     ]
 }
 
