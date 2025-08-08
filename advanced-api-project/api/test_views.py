@@ -41,6 +41,7 @@ class BookAPITestCase(APITestCase):
             'author': self.author.id,
         }
         response = self.client.post(self.create_url, data)
+        self.assertEqual(response.data["title"], "New Book")
         self.assertEqual(response.status_code, status.HTTP_201_CREATED)
 
     def test_update_book(self):
