@@ -62,6 +62,21 @@ class BookAPITestCase(APITestCase):
 
     # --- AUTHENTICATION / PERMISSION TESTS ---
 
+    def test_login_and_create_book(self):
+        logged_in = self.client.login(username='kvmofv', password='12345')
+        self.assertTrue(logged_in)  # Make sure login succeeded
+
+        data = {
+            "title": "Book Created After Login",
+            "author": self.author.id,
+            "publication_year": 2016
+        }
+
+        response = self.client.post(self.books_url, data)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED)
+        self.assertEqual(response.data["title"], "Book Created After Login")
+
+
     def test_unauthenticated_user_cannot_create_book(self):
         self.client.logout()
         data = {
