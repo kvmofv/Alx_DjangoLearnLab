@@ -17,7 +17,7 @@ class ListPostView(ListView):
 
 class DetailPostView(DetailView):
     model = Post
-    template_name = 'blog/detail.html'
+    template_name = 'blog/view.html'
     context_object_name = 'post'
 
 class CreatePostView(LoginRequiredMixin, CreateView):
