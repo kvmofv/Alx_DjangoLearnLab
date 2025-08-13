@@ -12,17 +12,17 @@ def home_view(request):
 
 class ListPostView(ListView):
     model = Post
-    template_name = 'blog/posts.html'
+    template_name = 'blog/list.html'
     context_object_name = 'posts'
 
 class DetailPostView(DetailView):
     model = Post
-    template_name = 'blog/detail_post.html'
+    template_name = 'blog/detail.html'
     context_object_name = 'post'
 
 class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
-    template_name = 'blog/create_post.html'
+    template_name = 'blog/form_create.html'
     form_class = CreatePostForm
     success_url = reverse_lazy('posts')
 
@@ -32,7 +32,7 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     
 class UpdatePostView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    template_name = 'blog/update_post.html'
+    template_name = 'blog/form_update.html'
     form_class = UpdatePostForm
     context_object_name = 'post'
     success_url = reverse_lazy('posts')
@@ -47,7 +47,7 @@ class UpdatePostView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     
 class DeletePostView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
-    template_name = 'blog/delete_post.html'
+    template_name = 'blog/delete.html'
     context_object_name = 'post'
     success_url = reverse_lazy('posts')
 

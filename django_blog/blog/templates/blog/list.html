@@ -1,0 +1,20 @@
+{% extends 'blog/base.html' %}
+{% load static %}
+
+{% block content %}
+<h2>Blog Posts</h2>
+
+<a href="{% url 'create_post' %}" class="btn">+ Create Post</a>
+
+<ul>
+    {% for post in posts %}
+        <li>
+            <h3>{{ post.title }}</h3>
+            <p><strong>By:</strong> {{ post.author }}</p>
+            <p>{{ post.content }}</p>  <!-- This shows the post body -->
+        </li>
+    {% empty %}
+        <li>No posts yet.</li>
+    {% endfor %}
+</ul>
+{% endblock %}
