@@ -1,32 +1,63 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
-from django.views.generic import CreateView, TemplateView, UpdateView, ListView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
+from django.views.generic import CreateView, TemplateView, UpdateView, ListView, DetailView, DeleteView
 from django.shortcuts import redirect, render
 from django.contrib import messages
-from .forms import RegistrationForm, UserUpdateForm, ProfileUpdateForm
 from django.urls import reverse_lazy
+from .forms import RegistrationForm, UserUpdateForm, ProfileUpdateForm
 from .models import Post
+from .forms import CreatePostForm, UpdatePostForm
 
+def home_view(request):
+    return render(request, 'home.html')
 
-class PostListView(ListView):
+class ListPostView(ListView):
     model = Post
     template_name = 'posts.html'
     context_object_name = 'posts'
 
+class DetailPostView(DetailView):
+    model = Post
+    template_name = 'detail_post.html'
+    context_object_name = 'post'
 
-class CreatePostView(CreateView, LoginRequiredMixin):
+class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
     template_name = 'create_post.html'
-    fields = ['title', 'content']
+    form_class = CreatePostForm
     success_url = reverse_lazy('posts')
 
     def form_valid(self, form):
-        form.instance.author =self.request.user
+        form.instance.author = self.request.user
         return super().form_valid(form)
-        
     
-def home_view(request):
-    return render(request, 'home.html')
+class UpdatePostView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
+    model = Post
+    template_name = 'update_post.html'
+    form_class = UpdatePostForm
+    context_object_name = 'post'
+    success_url = reverse_lazy('posts')
 
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(author=self.request.user)
+    
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
+    
+class DeletePostView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+    model = Post
+    template_name = 'delete_post.html'
+    context_object_name = 'post'
+    success_url = reverse_lazy('posts')
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(author=self.request.user)
+    
+    def test_func(self):
+        post = self.get_object()
+        return self.request.user == post.author
 
 class RegistrationView(CreateView):
     form_class = RegistrationForm

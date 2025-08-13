@@ -123,3 +123,23 @@ Testing Instructions|
 - Navigate to /profile/edit/.
 - Update username, email, bio, and image.
 - Submit and verify changes appear on the profile page.
+
+------------------------------------------
+for task 2:
+
+1. Templates Created
+- delete_post.html – Confirmation page for deleting a post, extends blog/base.html and loads static files.
+- update_post.html – Post update form page, extends blog/base.html and loads static files.
+- detail_post.html – Displays the full content of a single post, extends blog/base.html and loads static files.
+
+2. Form Integration
+- Added form rendering in update_post.html (and create_post.html) using {{ form.as_p }} for displaying form fields.
+
+3. Permissions & Access Control
+- Updated UpdateView and DeleteView to include:
+-LoginRequiredMixin – Only authenticated users can access update/delete.
+-UserPassesTestMixin – Only the post’s author can update/delete their own posts.
+- Implemented test_func() to check if the logged-in user is the author.
+
+4. Post Creation Permission
+- Ensured CreateView requires login via LoginRequiredMixin.
