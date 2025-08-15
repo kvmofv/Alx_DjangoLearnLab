@@ -85,10 +85,10 @@ class ListPostView(ListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        queryset= super().get_queryset()
+        queryset= Post.objects.all()
         query = self.request.GET.get('q')
         if query:
-            queryset = queryset.filter(
+            queryset = Post.objects.filter(
                 Q(title__icontains=query) |
                 Q(content__icontains=query) |
                 Q(tags__name__icontains=query)
@@ -97,7 +97,7 @@ class ListPostView(ListView):
 
 class TaggedPostListView(ListPostView):
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = Post.objects.all()
         tag__name = self.kwargs.get('tag__name')
         return queryset.filter(tag__name__iexact=tag__name)
     
