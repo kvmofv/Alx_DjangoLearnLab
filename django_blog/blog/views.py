@@ -17,7 +17,7 @@ class ListCommentView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
         context['post'] = post
         context['comments'] = post.comment_set.all()
         context['form'] = CreateCommentForm()
@@ -29,22 +29,21 @@ class CommentCreateView(CreateView):
     form_class = CreateCommentForm
 
     def form_valid(self, form):
-        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        post = get_object_or_404(Post, pk=self.kwargs['pk'])
         form.instance.post = post
         form.instance.author = self.request.user
         return super().form_valid(form)
     
     def get_success_url(self):
-        return reverse('post_detail', kwargs={'pk': self.kwargs['post_id']})
+        return reverse('post_detail', kwargs={'pk': self.kwargs['pk']})
     
 class CommentUpdateView(UpdateView):
     model = Comment
     template_name = 'post/post_detail.html'
     form_class = UpdateCommentForm
 
-    def get_queryset(self):
-        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
-        return post.comment_set.all()
+    def get_object(self, queryset=None):
+        return get_object_or_404(Comment, pk=self.kwargs['comment_pk'])
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -54,29 +53,28 @@ class CommentUpdateView(UpdateView):
         context['comments'] = post.comment_set.all()
         context['form'] = CreateCommentForm()
         context['editing_comment'] = comment
-        return context 
+        return context
 
     def get_success_url(self):
         return reverse('post_detail', kwargs={'pk': self.object.post.id})
-    
+
 class CommentDeleteView(DeleteView):
     model = Comment
     template_name = 'post/post_detail.html'
 
-    def get_queryset(self):
-        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
-        return post.comment_set.all()
-    
+    def get_object(self, queryset=None):
+        return get_object_or_404(Comment, pk=self.kwargs['comment_pk'])
+
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         comment = self.get_object()
         post = comment.post
         context['post'] = post
-        context['comment'] = post.comment_set.all()
+        context['comments'] = post.comment_set.all()
         context['form'] = CreateCommentForm()
         context['deleting_comment'] = comment
         return context
-    
+
     def get_success_url(self):
         return reverse('post_detail', kwargs={'pk': self.object.post.id})
 
