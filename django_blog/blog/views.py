@@ -1,28 +1,104 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import CreateView, TemplateView, UpdateView, ListView, DetailView, DeleteView
-from django.shortcuts import redirect, render
+from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from .forms import RegistrationForm, UserUpdateForm, ProfileUpdateForm
-from .models import Post
-from .forms import CreatePostForm, UpdatePostForm
+from .models import Post, Comment
+from .forms import CreatePostForm, UpdatePostForm, CreateCommentForm, UpdateCommentForm
 
 def home_view(request):
-    return render(request, 'home.html')
+    return render(request, 'blog/home.html')
+
+class ListCommentView(ListView):
+    model = Comment
+    template_name = 'post/post_detail.html'
+    context_object_name = 'comments'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        context['post'] = post
+        context['comments'] = post.comment_set.all()
+        context['form'] = CreateCommentForm()
+        return context
+
+class CreateCommentView(CreateView):
+    model = Comment
+    template_name = 'post/post_detail.html'
+    form_class = CreateCommentForm
+
+    def form_valid(self, form):
+        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        form.instance.post = post
+        form.instance.author = self.request.user
+        return super().form_valid(form)
+    
+    def get_success_url(self):
+        return reverse('post_detail', kwargs={'pk': self.kwargs['post_id']})
+    
+class UpdateCommentView(UpdateView):
+    model = Comment
+    template_name = 'post/post_detail.html'
+    form_class = UpdateCommentForm
+
+    def get_queryset(self):
+        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        return post.comment_set.all()
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        comment = self.get_object()
+        post = comment.post
+        context['post'] = post
+        context['comments'] = post.comment_set.all()
+        context['form'] = CreateCommentForm()
+        context['editing_comment'] = comment
+        return context 
+
+    def get_success_url(self):
+        return reverse('post_detail', kwargs={'pk': self.object.post.id})
+    
+class DeleteCommentView(DeleteView):
+    model = Comment
+    template_name = 'post/post_detail.html'
+
+    def get_queryset(self):
+        post = get_object_or_404(Post, pk=self.kwargs['post_id'])
+        return post.comment_set.all()
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        comment = self.get_object()
+        post = comment.post
+        context['post'] = post
+        context['comment'] = post.comment_set.all()
+        context['form'] = CreateCommentForm()
+        context['deleting_comment'] = comment
+        return context
+    
+    def get_success_url(self):
+        return reverse('post_detail', kwargs={'pk': self.object.post.id})
 
 class ListPostView(ListView):
     model = Post
-    template_name = 'blog/list.html'
+    template_name = 'post/list.html'
     context_object_name = 'posts'
 
 class DetailPostView(DetailView):
     model = Post
-    template_name = 'blog/view.html'
+    template_name = 'post/post_detail.html'
     context_object_name = 'post'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['comments'] = self.object.comment_set.all()
+        context['form'] = CreateCommentForm() 
+        return context
 
 class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
-    template_name = 'blog/form_create.html'
+    template_name = 'post/form_create.html'
     form_class = CreatePostForm
     success_url = reverse_lazy('posts')
 
@@ -32,7 +108,7 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     
 class UpdatePostView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    template_name = 'blog/form_update.html'
+    template_name = 'post/form_update.html'
     form_class = UpdatePostForm
     context_object_name = 'post'
     success_url = reverse_lazy('posts')
@@ -47,7 +123,7 @@ class UpdatePostView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     
 class DeletePostView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
-    template_name = 'blog/delete.html'
+    template_name = 'post/delete.html'
     context_object_name = 'post'
     success_url = reverse_lazy('posts')
 
@@ -65,7 +141,7 @@ class RegistrationView(CreateView):
     success_url = reverse_lazy('login')
 
 class ProfileView(LoginRequiredMixin, TemplateView):
-    template_name = 'profile.html'
+    template_name = 'profile/profile.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -73,7 +149,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         return context
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
-    template_name = 'profile_edit.html'
+    template_name = 'profile/profile_edit.html'
 
     def get(self, request, *args, **kwargs):
         u_form = UserUpdateForm(instance= request.user)
