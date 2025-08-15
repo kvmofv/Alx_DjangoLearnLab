@@ -1,5 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.views.generic import CreateView, TemplateView, UpdateView, ListView, DetailView, DeleteView
+from django.db.models import Q
 from django.shortcuts import redirect, render, get_object_or_404
 from django.contrib import messages
 from django.urls import reverse_lazy, reverse
@@ -82,6 +83,39 @@ class ListPostView(ListView):
     model = Post
     template_name = 'post/list.html'
     context_object_name = 'posts'
+
+    def get_queryset(self):
+        queryset= super().get_queryset()
+        query = self.request.GET.get('q')
+        if query:
+            queryset = queryset.filter(
+                Q(title__icontains=query) |
+                Q(content__icontains=query) |
+                Q(tags__name__icontains=query)
+            ).distinct()
+        return queryset
+
+class TaggedPostListView(ListPostView):
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        tag__name = self.kwargs.get('tag__name')
+        return queryset.filter(tag__name__iexact=tag__name)
+    
+class SearchResultView(ListView):
+    model = Post
+    template_name = 'post/search_result.html'
+    context_object_name = 'filtered_posts'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        query = self.request.GET.get('q')
+        if query:
+            queryset = queryset.filter(
+                Q(title__icontains=query) |
+                Q(content__icontains=query) |
+                Q(tags__name__icontains=query)
+            ).distinct()
+        return queryset
 
 class DetailPostView(DetailView):
     model = Post

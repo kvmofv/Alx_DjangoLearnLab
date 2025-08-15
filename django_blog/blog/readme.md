@@ -143,3 +143,27 @@ for task 2:
 
 4. Post Creation Permission
 - Ensured CreateView requires login via LoginRequiredMixin.
+
+----------------------------------------
+
+Tagging & Search Features
+
+Adding Tags to Posts
+- When creating or editing a post, locate the Tags input field in the form.
+- Enter one or more tags separated by commas (e.g., django, python, backend).
+- Tags should be short and descriptive.
+- Tags are case-insensitive (Python and python are treated the same).
+- Click Save to apply the tags to the post.
+
+Browsing by Tags
+- On the blog’s post list or individual post pages, tags are displayed under the post title or content.
+- Click on a tag to view all posts associated with it.
+
+Using the Search Bar
+- The search bar is available at the top of the post listing page.
+- Enter keywords to search in post titles, content, or tags.
+- Search results are filtered automatically based on your input.
+
+Examples:
+- Searching for django shows all posts tagged with "django" or containing "django" in the content/title.
+- Clicking the tag python shows only posts related to Python.
