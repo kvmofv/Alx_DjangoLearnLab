@@ -23,7 +23,7 @@ class ListCommentView(ListView):
         context['form'] = CreateCommentForm()
         return context
 
-class CreateCommentView(CreateView):
+class CommentCreateView(CreateView):
     model = Comment
     template_name = 'post/post_detail.html'
     form_class = CreateCommentForm
@@ -37,7 +37,7 @@ class CreateCommentView(CreateView):
     def get_success_url(self):
         return reverse('post_detail', kwargs={'pk': self.kwargs['post_id']})
     
-class UpdateCommentView(UpdateView):
+class CommentUpdateView(UpdateView):
     model = Comment
     template_name = 'post/post_detail.html'
     form_class = UpdateCommentForm
@@ -59,7 +59,7 @@ class UpdateCommentView(UpdateView):
     def get_success_url(self):
         return reverse('post_detail', kwargs={'pk': self.object.post.id})
     
-class DeleteCommentView(DeleteView):
+class CommentDeleteView(DeleteView):
     model = Comment
     template_name = 'post/post_detail.html'
 
