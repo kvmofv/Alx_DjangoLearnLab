@@ -85,7 +85,7 @@ class ListPostView(ListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        queryset= Post.objects.all()
+        queryset = Post.objects.all()
         query = self.request.GET.get('q')
         if query:
             queryset = Post.objects.filter(
@@ -95,12 +95,11 @@ class ListPostView(ListView):
             ).distinct()
         return queryset
 
-class TaggedPostListView(ListPostView):
+class PostByTagListView(ListPostView):
     def get_queryset(self):
-        queryset = Post.objects.all()
-        tag__name = self.kwargs.get('tag__name')
-        return queryset.filter(tag__name__iexact=tag__name)
-    
+        tag_slug = self.kwargs.get('tag_slug')
+        return Post.objects.filter(tags__slug=tag_slug)
+
 class SearchResultView(ListView):
     model = Post
     template_name = 'post/search_result.html'
