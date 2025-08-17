@@ -13,7 +13,7 @@ def home_view(request):
 
 class ListCommentView(ListView):
     model = Comment
-    template_name = 'post/post_detail.html'
+    template_name = 'blog/post_detail.html'
     context_object_name = 'comments'
 
     def get_context_data(self, **kwargs):
@@ -26,7 +26,7 @@ class ListCommentView(ListView):
 
 class CommentCreateView(CreateView):
     model = Comment
-    template_name = 'post/post_detail.html'
+    template_name = 'blog/post_detail.html'
     form_class = CreateCommentForm
 
     def form_valid(self, form):
@@ -40,7 +40,7 @@ class CommentCreateView(CreateView):
     
 class CommentUpdateView(UpdateView):
     model = Comment
-    template_name = 'post/post_detail.html'
+    template_name = 'blog/post_detail.html'
     form_class = UpdateCommentForm
 
     def get_object(self, queryset=None):
@@ -61,7 +61,7 @@ class CommentUpdateView(UpdateView):
 
 class CommentDeleteView(DeleteView):
     model = Comment
-    template_name = 'post/post_detail.html'
+    template_name = 'blog/post_detail.html'
 
     def get_object(self, queryset=None):
         return get_object_or_404(Comment, pk=self.kwargs['comment_pk'])
@@ -81,7 +81,7 @@ class CommentDeleteView(DeleteView):
 
 class ListPostView(ListView):
     model = Post
-    template_name = 'post/list.html'
+    template_name = 'blog/post_list.html'
     context_object_name = 'posts'
 
     def get_queryset(self):
@@ -102,7 +102,7 @@ class PostByTagListView(ListPostView):
 
 class SearchResultView(ListView):
     model = Post
-    template_name = 'post/search_result.html'
+    template_name = 'blog/search_result.html'
     context_object_name = 'filtered_posts'
 
     def get_queryset(self):
@@ -118,7 +118,7 @@ class SearchResultView(ListView):
 
 class DetailPostView(DetailView):
     model = Post
-    template_name = 'post/post_detail.html'
+    template_name = 'blog/post_detail.html'
     context_object_name = 'post'
 
     def get_context_data(self, **kwargs):
@@ -129,7 +129,7 @@ class DetailPostView(DetailView):
 
 class CreatePostView(LoginRequiredMixin, CreateView):
     model = Post
-    template_name = 'post/form_create.html'
+    template_name = 'blog/post_form.html'
     form_class = CreatePostForm
     success_url = reverse_lazy('posts')
 
@@ -139,7 +139,7 @@ class CreatePostView(LoginRequiredMixin, CreateView):
     
 class UpdatePostView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Post
-    template_name = 'post/form_update.html'
+    template_name = 'blog/form_update.html'
     form_class = UpdatePostForm
     context_object_name = 'post'
     success_url = reverse_lazy('posts')
@@ -154,7 +154,7 @@ class UpdatePostView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     
 class DeletePostView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
     model = Post
-    template_name = 'post/delete.html'
+    template_name = 'blog/post_confirm_delete.html'
     context_object_name = 'post'
     success_url = reverse_lazy('posts')
 
@@ -168,11 +168,11 @@ class DeletePostView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
 
 class RegistrationView(CreateView):
     form_class = RegistrationForm
-    template_name = 'registration/register.html'
+    template_name = 'blog/register.html'
     success_url = reverse_lazy('login')
 
 class ProfileView(LoginRequiredMixin, TemplateView):
-    template_name = 'profile/profile.html'
+    template_name = 'blog/profile.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
@@ -180,7 +180,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
         return context
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
-    template_name = 'profile/profile_edit.html'
+    template_name = 'blog/edit_profile.html'
 
     def get(self, request, *args, **kwargs):
         u_form = UserUpdateForm(instance= request.user)
