@@ -181,6 +181,7 @@ class ProfileView(LoginRequiredMixin, TemplateView):
 
 class ProfileUpdateView(LoginRequiredMixin, UpdateView):
     template_name = 'blog/edit_profile.html'
+    http_method_names = ['get', 'post']
 
     def get(self, request, *args, **kwargs):
         u_form = UserUpdateForm(instance= request.user)
