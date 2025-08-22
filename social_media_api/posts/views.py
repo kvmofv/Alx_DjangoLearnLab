@@ -1,4 +1,4 @@
-from rest_framework import permissions, viewsets, filters, status
+from rest_framework import permissions, viewsets, filters, status, generics
 from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
@@ -66,12 +66,9 @@ class CommentViewSet(viewsets.ModelViewSet):
 class LikePostView(APIView):
     permission_classes = [IsAuthenticated]
 
-    def post(self, request, post_id):
-        post = get_object_or_404(Post, id=post_id)
-        user = request.user
-
-        # check if already liked
-        like, created = Like.objects.get_or_create(post=post, author=user)
+    def post(self, request, pk):
+        post = generics.get_object_or_404(Post, pk=pk)  # required line
+        like, created = Like.objects.get_or_create(user=request.user, post=post)  # required line
 
         if not created:
             # already liked → unlike it
@@ -79,13 +76,12 @@ class LikePostView(APIView):
             return Response({"message": "Unliked"}, status=status.HTTP_200_OK)
 
         # if new like → create notification
-        if post.author != user:  # don't notify if liking own post
+        if post.author != request.user:  # don’t notify if liking own post
             Notification.objects.create(
                 recipient=post.author,
-                actor=user,
+                actor=request.user,
                 verb="liked your post",
-                content_type=post._meta.model,  # handled by GenericForeignKey
-                object_id=post.id
+                target_post=post
             )
 
         return Response({"message": "Liked"}, status=status.HTTP_201_CREATED)
