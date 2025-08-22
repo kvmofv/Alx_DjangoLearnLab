@@ -19,15 +19,16 @@ class RegistrationView(generics.CreateAPIView):
             status=status.HTTP_201_CREATED
         )
     
-class LoginView(views.APIView):
+class LoginView(APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
-            user = serializer.validated_data
-            return Response(
-                {"message": "Login Success. ", "username": user.username},
-                status=status.HTTP_200_OK
-            )
+            data = serializer.validated_data  # contains {"user": user, "token": token.key}
+            return Response({
+                "username": data["user"].username,
+                "email": data["user"].email,
+                "token": data["token"]
+            }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class TokenView(views.APIView):
