@@ -96,3 +96,52 @@ Response:
 4. Authenticated Requests
 
 - Add token in the Authorization header: {Authorization: Token abcd1234efgh5678}
+------------------------------------
+Testing:
+
+How to Run Tests
+
+- Make sure you are inside your Django project root (where manage.py lives).
+
+Run all tests:
+
+- python manage.py test
+
+------------------|
+Post API Tests    |
+------------------|
+Tests implemented:
+
+- Create Post – ensures authenticated users can create posts.
+- List Posts – validates retrieval of all posts with pagination.
+- Update Own Post – confirms only the author can edit their own posts.
+- Delete Other’s Post Forbidden – prevents users from deleting posts they don’t own.
+
+Sample Output (truncated):
+
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+....
+----------------------------------------------------------------------
+Ran 4 tests in 1.234s
+
+OK
+
+Comment API Tests
+
+Tests implemented:
+
+- Create Comment – verifies that authenticated users can comment on posts.
+- List Comments – checks comments list with pagination for a given post.
+- Update Own Comment – ensures only the comment author can update their content.
+- Delete Other’s Comment Forbidden – validates that users cannot delete comments they don’t own.
+
+Sample Output (truncated):
+
+Creating test database for alias 'default'...
+System check identified no issues (0 silenced).
+....
+----------------------------------------------------------------------
+Ran 4 tests in 1.678s
+
+OK

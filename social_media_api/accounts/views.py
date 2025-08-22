@@ -19,7 +19,7 @@ class RegistrationView(generics.CreateAPIView):
             status=status.HTTP_201_CREATED
         )
     
-class LoginView(APIView):
+class LoginView(views.APIView):
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
