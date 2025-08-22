@@ -1,8 +1,13 @@
-from rest_framework import permissions, viewsets, filters
-from .models import Post, Comment
+from rest_framework import permissions, viewsets, filters, status
+from rest_framework.views import APIView
+from rest_framework.decorators import action
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from django.shortcuts import get_object_or_404
+from notifications.models import Notification
+from .models import Post, Comment, Like
 from .serializers import PostSerializer, CommentSerializer
 from .pagination import PostCommentPagination
-from django.shortcuts import get_object_or_404
 
 class IsOwnerOrReadOnly(permissions.BasePermission):
     def has_object_permission(self, request, view, obj):
@@ -16,10 +21,32 @@ class PostViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly]
     pagination_class = PostCommentPagination
     filter_backends = [filters.SearchFilter]
-    search_fields = ['tilte', 'content']
+    search_fields = ['title', 'content']
 
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
+
+    @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
+    def like(self, request, pk=None):
+        post = self.get_object()
+        user = request.user
+        like, created = Like.objects.get_or_create(post=post, author=user)
+
+        if created:
+            # Notify post author (only if it's not the same user)
+            if post.author != user:
+                Notification.objects.create(
+                    recipient=post.author,
+                    actor=user,
+                    verb="liked your post",
+                    content_type=ContentType.objects.get_for_model(Post),
+                    object_id=post.id
+                )
+            return Response({"message": "Liked"}, status=status.HTTP_201_CREATED)
+
+        else:
+            like.delete()
+            return Response({"message": "Unliked"}, status=status.HTTP_200_OK)
 
 class CommentViewSet(viewsets.ModelViewSet):
     queryset = Comment.objects.all()
@@ -35,3 +62,30 @@ class CommentViewSet(viewsets.ModelViewSet):
         post_id = self.kwargs.get("post_pk")
         post = get_object_or_404(Post, id=post_id)
         serializer.save(author=self.request.user, post=post)
+
+class LikePostView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, post_id):
+        post = get_object_or_404(Post, id=post_id)
+        user = request.user
+
+        # check if already liked
+        like, created = Like.objects.get_or_create(post=post, author=user)
+
+        if not created:
+            # already liked → unlike it
+            like.delete()
+            return Response({"message": "Unliked"}, status=status.HTTP_200_OK)
+
+        # if new like → create notification
+        if post.author != user:  # don't notify if liking own post
+            Notification.objects.create(
+                recipient=post.author,
+                actor=user,
+                verb="liked your post",
+                content_type=post._meta.model,  # handled by GenericForeignKey
+                object_id=post.id
+            )
+
+        return Response({"message": "Liked"}, status=status.HTTP_201_CREATED)

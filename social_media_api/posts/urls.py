@@ -1,5 +1,4 @@
 from rest_framework_nested import routers
-from django.urls import path, include
 from . views import PostViewSet, CommentViewSet
 
 router = routers.DefaultRouter()

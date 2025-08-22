@@ -145,3 +145,42 @@ System check identified no issues (0 silenced).
 Ran 4 tests in 1.678s
 
 OK
+
+
+------------------------------------------
+
+Notification Tests:
+
+1. Like a post
+
+- Endpoint: POST /posts/{id}/like/
+- Expected: 
+    * Response: { "status": "liked" }
+    * Post’s likes count increases
+    * A new Notification is created for the post owner
+
+2. Unlike a post
+- Endpoint: POST /posts/{id}/unlike/
+- Expected:
+    * Response: { "status": "unliked" }
+    * Post’s likes count decreases
+    * No new notification should be created here
+
+3. View notifications
+- Endpoint: GET /notifications/
+- Expected:
+    * Returns a list of notifications
+    * Check that the post owner sees a new notification when their post is liked
+    * Mark a notification as read
+
+4. Mark as read
+- Endpoint: POST /notifications/{id}/mark_as_read/
+- Expected:
+    * That notification’s is_read becomes true
+
+
+5. Mark all as read
+- Endpoint: POST /notifications/mark_all_as_read/
+- Expected:
+    * All unread notifications for the user get marked as read
+
