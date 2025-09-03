@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework import status, generics, views
-from django.shortcuts import render
+from rest_framework import permissions
 from . serializers import UserRegestrationSerializer, LoginSerializer, TokenSerializer
 from .models import CustomUser
 
@@ -31,10 +31,11 @@ class LoginView(views.APIView):
             }, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class TokenView(views.APIView):
-    def post(sefl, request):
-        serializer = TokenSerializer(datat=request.data)
-        if serializer.is_valid():
-            user = serializer.validated_data
-            return Response(serializer.validated_data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class TokenView(generics.GenericAPIView):
+    serializer_class = TokenSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        serializer = self.get_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        return Response(serializer.validated_data, status=status.HTTP_200_OK)
