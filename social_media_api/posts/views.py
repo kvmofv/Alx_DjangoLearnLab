@@ -3,6 +3,7 @@ from rest_framework.views import APIView
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
+from django.contrib.contenttypes.models import ContentType
 from django.shortcuts import get_object_or_404
 from notifications.models import Notification
 from .models import Post, Comment, Like
@@ -26,6 +27,20 @@ class PostViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(author=self.request.user)
 
+    @action(detail=False, methods=["get"], permission_classes=[permissions.IsAuthenticated])
+    def feed(self, request):
+        following_users = request.user.following.all()  
+
+        posts = Post.objects.filter(author__in=following_users).order_by("-created_at")  
+
+        page = self.paginate_queryset(posts)
+        if page is not None:
+            serializer = self.get_serializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(posts, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
     @action(detail=True, methods=["post"], permission_classes=[permissions.IsAuthenticated])
     def like(self, request, pk=None):
         post = self.get_object()
@@ -33,7 +48,6 @@ class PostViewSet(viewsets.ModelViewSet):
         like, created = Like.objects.get_or_create(post=post, author=user)
 
         if created:
-            # Notify post author (only if it's not the same user)
             if post.author != user:
                 Notification.objects.create(
                     recipient=post.author,
@@ -43,7 +57,6 @@ class PostViewSet(viewsets.ModelViewSet):
                     object_id=post.id
                 )
             return Response({"message": "Liked"}, status=status.HTTP_201_CREATED)
-
         else:
             like.delete()
             return Response({"message": "Unliked"}, status=status.HTTP_200_OK)
