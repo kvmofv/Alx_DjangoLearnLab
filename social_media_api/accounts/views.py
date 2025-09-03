@@ -41,7 +41,7 @@ class TokenView(generics.GenericAPIView):
         serializer.is_valid(raise_exception=True)
         return Response(serializer.validated_data, status=status.HTTP_200_OK)
 
-class FollowUserView(generics.APIView):
+class FollowUserView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
@@ -54,7 +54,7 @@ class FollowUserView(generics.APIView):
         return Response({"message": f"You are now following {user_to_follow.username}"}, status=status.HTTP_200_OK)
 
 
-class UnfollowUserView(generics.APIView):
+class UnfollowUserView(views.APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, user_id):
